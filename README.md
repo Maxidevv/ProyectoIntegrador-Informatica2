@@ -54,7 +54,11 @@ Este dataset se utilizó como base para:
 
 ## 👨‍💻 Equipo  
 Este proyecto fue desarrollado en equipo como práctica académica.  
-
+- Maxi Moncada
+- Justo Rocha
+- Matias Moyano
+- Santiago Abulafia
+- Benja Baca
 ---
 
 ## 📜 Licencia  
