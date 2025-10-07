@@ -1,5 +1,5 @@
 [README.md](https://github.com/user-attachments/files/22561615/README.md)
-# Proyecto de comparativa usando un tipo de dato abstracto en el lenguague de Programacion C con Datasets de Litio usando Pila ⚡
+# Proyecto en Lenguague de Programacion C ⚡
 
 ## 📌 Descripción  
 Este proyecto forma parte de un trabajo práctico en el que se seleccionó dos **dataset público del Gobierno de Argentina**.  
