@@ -1,37 +1,36 @@
 [README.md](https://github.com/user-attachments/files/22561615/README.md)
-# Proyecto Comparativa de Listas en C con Dataset de Litio ⚡
+# Proyecto de comparativa usando un tipo de dato abstracto en el lenguague de Programacion C con Datasets de Litio usando Pila ⚡
 
 ## 📌 Descripción  
-Este proyecto forma parte de un trabajo práctico en el que se seleccionó un **dataset público del Gobierno de Argentina**.  
-En nuestro caso, elegimos un **dataset relacionado con el litio**, uno de los recursos más importantes para la industria energética y tecnológica.  
+Este proyecto forma parte de un trabajo práctico en el que se seleccionó dos **dataset público del Gobierno de Argentina**.  
+En nuestro caso, elegimos dos **datasets relacionado con el litio**, un dataset de los paises con mas litio a nivel mundial y otro dataset con los paises que mas producen litio.  
 
-El objetivo es realizar una **comparativa de estructuras de datos lineales (Pila y Cola)** implementadas en **lenguaje C**, aplicadas sobre la información obtenida del dataset.  
+El objetivo es realizar una **comparativa usando Pila como un tipo de dato abstracto** implementadas en **lenguaje C**, aplicadas sobre la información obtenida de los datasets.  
 
 ---
 
 ## 📊 Dataset  
-El dataset fue obtenido del [Portal de Datos Abiertos del Gobierno de Argentina](https://datos.gob.ar/).  
-Contiene información relacionada con la producción y explotación de litio en el país.  
+Los datasets fueron obtenidos del [Portal de Datos Abiertos del Gobierno de Argentina](https://datos.gob.ar/).  
+Contiene información relacionada con el litio a nivel mundial.  
 
-Este dataset se utilizó como base para:  
+Estos datasets se utilizaron como base para:  
 - Practicar operaciones con **listas dinámicas**.  
-- Implementar **estructuras de Pila y Cola** en C.  
-- Analizar y comparar el manejo de datos en ambas estructuras.  
+- Implementar **estructuras de Pila** en C.  
+- Analizar y comparar el manejo de datos en ambos datasets.  
 
 ---
 
 ## ⚙️ Tecnologías y Herramientas  
 - **Lenguaje de Programación:** C  
-- **Dataset:** Litio (Gobierno de Argentina)  
+- **Datasets:*Produccion de litio a nivel mundial | Reserva de litio a nivel mundial.*   
 - **Control de versiones:** Git / GitHub  
 
 ---
 
 ## 🧩 Funcionalidades  
-✔️ Implementación de **Pila** (Stack).  
-✔️ Implementación de **Cola** (Queue).  
-✔️ Carga y recorrido del dataset utilizando ambas estructuras.  
-✔️ Comparativa del comportamiento de los datos en cada estructura.  
+✔️ Implementación de **Pila** (Stack).    
+✔️ Carga y recorrido del dataset utilizando Pila y Memoria Dinamica.  
+✔️ Comparativa del comportamiento de los datos.  
 
 ---
 
@@ -54,9 +53,9 @@ Este dataset se utilizó como base para:
 
 ## 👨‍💻 Equipo  
 Este proyecto fue desarrollado en equipo como práctica académica.  
-- Maxi Moncada
+- Maxi Moncada @maxilucianomoncada@gmail.com
 - Justo Rocha
-- Matias Moyano
+- Matias Moyano @matiasmoyanobustos@gmail.com
 - Santiago Abulafia
 - Benja Baca
 ---
