@@ -22,7 +22,7 @@ Estos datasets se utilizaron como base para:
 
 ## ⚙️ Tecnologías y Herramientas  
 - **Lenguaje de Programación:** C  
-- **Datasets:**Produccion de litio a nivel mundial | Reserva de litio a nivel mundial.   
+- **Datasets:** Produccion de litio a nivel mundial | Reserva de litio a nivel mundial.   
 - **Control de versiones:** Git / GitHub  
 
 ---
