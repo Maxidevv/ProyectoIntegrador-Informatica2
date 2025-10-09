@@ -1,5 +1,5 @@
 [README.md](https://github.com/user-attachments/files/22561615/README.md)
-# Proyecto en Lenguague de Programacion C ⚡
+# Proyecto en Lenguaje de Programacion C ⚡
 
 ## 📌 Descripción  
 Este proyecto forma parte de un trabajo práctico en el que se seleccionó dos **dataset público del Gobierno de Argentina**.  
@@ -54,7 +54,7 @@ Estos datasets se utilizaron como base para:
 ## 👨‍💻 Equipo  
 Este proyecto fue desarrollado en equipo como práctica académica.  
 - Maxi Moncada maxilucianomoncada@gmail.com
-- Justo Rocha
+- Justo Rocha Justo31@proton.me
 - Matias Moyano matiasmoyanobustos@gmail.com
 - Santiago Abulafia
 - Benja Baca
