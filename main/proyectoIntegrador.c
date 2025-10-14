@@ -1,15 +1,18 @@
-<<<<<<< HEAD
 int main() 
 {
     char eleccionUsuario;
     FILE *fp;
 
-    printf("Bienvenido al programa.\n");
+        printf("========================================================================\n");
+        printf("                                                      B I E N V E N I D O / A                                                                        \n");
+        printf("                                                 P R O Y E C T O   C:   L I T I O                                                                 \n");
+        printf("========================================================================\n");
     do 
     {
-        printf("________________________________________________________\n");
+        printf("=============================================\n");
         printf("[A] Leer archivos. \n[B] - Ordenar. \n[C] Imprimir.");
-        printf("________________________________________________________\n");
+        printf("=============================================\n");
+        printf("\n");
         printf("A continuacion ingrese una opcion:\n> ");
         scanf("%c ", &eleccionUsuario);
         eleccionUsuario = tolower(eleccionUsuario);
@@ -17,6 +20,8 @@ int main()
         switch(eleccionUsuario) 
         {
             case 'a':
+                printf("Usted ingreso a la opcion A.\n");
+                leer_csv();
                 break;
             case 'b':
                 break;
@@ -29,6 +34,3 @@ int main()
 
     return 0;
 }
-=======
-#include <stdio.h>
->>>>>>> e9382bb8f4c1db8e6f77eb164238b7bdb68b97a9
