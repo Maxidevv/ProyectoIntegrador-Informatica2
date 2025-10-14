@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 int main() 
 {
     char eleccionUsuario;
@@ -28,3 +29,6 @@ int main()
 
     return 0;
 }
+=======
+#include <stdio.h>
+>>>>>>> e9382bb8f4c1db8e6f77eb164238b7bdb68b97a9
