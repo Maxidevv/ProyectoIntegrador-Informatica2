@@ -57,7 +57,7 @@ Este proyecto fue desarrollado en equipo como práctica académica.
 - Justo Rocha Justo31@proton.me
 - Matias Moyano matiasmoyanobustos@gmail.com
 - Santiago Abulafia santiagoabulafia@gmail.com
-- Benja Baca
+- Benja Baca benjabacajuegos@gmail.com
 ---
 
 ## 📜 Licencia  
