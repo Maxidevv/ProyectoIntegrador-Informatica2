@@ -3,27 +3,29 @@
 
 ## 📌 Descripción  
 Este proyecto forma parte de un trabajo práctico en el que se seleccionó dos **dataset público del Gobierno de Argentina**.  
-En nuestro caso, elegimos dos **datasets relacionado con el litio**, un dataset de los paises con mas litio a nivel mundial y otro dataset con los paises que mas producen litio.  
+En nuestro caso, elegimos un **dataset relacionado con el litio**, un dataset de los paises con mas litio a nivel mundial.  
 
-El objetivo es realizar una **comparativa usando Pila como un tipo de dato abstracto** implementadas en **lenguaje C**, aplicadas sobre la información obtenida de los datasets.  
+El objetivo es realizar una **comparativa usando Pila como un tipo de dato abstracto** implementadas en **lenguaje C**, aplicadas sobre la información obtenida del dataset.  
 
 ---
 
 ## 📊 Dataset  
-Los datasets fueron obtenidos del [Portal de Datos Abiertos del Gobierno de Argentina](https://datos.gob.ar/).  
+El dataset fue obtenido del [Portal de Datos Abiertos del Gobierno de Argentina](https://datos.gob.ar/).  
 Contiene información relacionada con el litio a nivel mundial.  
 
-Estos datasets se utilizaron como base para:  
+El dataset se utilizo como base para:  
 - Practicar operaciones con **listas dinámicas**.  
 - Implementar **estructuras de Pila** en C.  
-- Analizar y comparar el manejo de datos en ambos datasets.  
+- Analizar y comparar el manejo de datos en el dataset.  
 
 ---
 
 ## ⚙️ Tecnologías y Herramientas  
-- **Lenguaje de Programación:** C  
-- **Datasets:** Produccion de litio a nivel mundial | Reserva de litio a nivel mundial.   
-- **Control de versiones:** Git / GitHub  
+- **Lenguaje de Programación:** C.  
+- **Dataset:** Reserva de litio a nivel mundial.   
+- **Control de versiones:** Git / GitHub.  
+- **IDE utilizado:** Visual Studio Code y Zinjal.
+- **Plugin utilizado:** Para el trabajo colaborativo se utilizo un plugin de VSC llamado Live Share que nos permitio trabajar de manera simultanea en el mismo archivo C.
 
 ---
 
@@ -31,23 +33,6 @@ Estos datasets se utilizaron como base para:
 ✔️ Implementación de **Pila** (Stack).    
 ✔️ Carga y recorrido del dataset utilizando Pila y Memoria Dinamica.  
 ✔️ Comparativa del comportamiento de los datos.  
-
----
-
-## 🚀 Ejecución del proyecto  
-
-1. Clonar el repositorio:  
-   ```bash
-   git clone https://github.com/usuario/proyecto-litio-c.git
-   ```
-2. Compilar el programa en C:  
-   ```bash
-   gcc main.c -o proyecto
-   ```
-3. Ejecutar:  
-   ```bash
-   ./proyecto
-   ```
 
 ---
 
