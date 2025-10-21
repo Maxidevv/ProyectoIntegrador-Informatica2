@@ -56,7 +56,7 @@ Este proyecto fue desarrollado en equipo como práctica académica.
 - Maxi Moncada maxilucianomoncada@gmail.com
 - Justo Rocha Justo31@proton.me
 - Matias Moyano matiasmoyanobustos@gmail.com
-- Santiago Abulafia
+- Santiago Abulafia santiagoabulafia@gmail.com
 - Benja Baca
 ---
 
