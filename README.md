@@ -14,7 +14,7 @@ El dataset fue obtenido del [Portal de Datos Abiertos del Gobierno de Argentina]
 Contiene información relacionada con el litio a nivel mundial.  
 
 El dataset se utilizo como base para:  
-- Practicar operaciones con **listas dinámicas**.  
+- Practicar operaciones con **dato abstracto**.  
 - Implementar **estructuras de Pila** en C.  
 - Analizar y comparar el manejo de datos en el dataset.  
 
@@ -24,7 +24,7 @@ El dataset se utilizo como base para:
 - **Lenguaje de Programación:** C.  
 - **Dataset:** Reserva de litio a nivel mundial.   
 - **Control de versiones:** Git / GitHub.  
-- **IDE utilizado:** Visual Studio Code y Zinjal.
+- **IDEs utilizados:** Visual Studio Code y Zinjal.
 - **Plugin utilizado:** Para el trabajo colaborativo se utilizo un plugin de VSC llamado Live Share que nos permitio trabajar de manera simultanea en el mismo archivo C.
 
 ---
