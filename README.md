@@ -46,4 +46,5 @@ Este proyecto fue desarrollado en equipo como práctica académica.
 ---
 
 ## 📜 Licencia  
-Este proyecto utiliza datos públicos disponibles en el **Portal de Datos Abiertos de Argentina**.  
+Este proyecto utiliza datos públicos disponibles en el **Portal de Datos Abiertos de Argentina**. 
+Este repositorio sera de caracter publico.  
