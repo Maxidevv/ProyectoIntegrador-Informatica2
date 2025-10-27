@@ -1,428 +1,309 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h> 
+#include <time.h>
 #include <ctype.h>
-#include <windows.h> 
+#include <unistd.h>
+#include <strings.h> // Para strcasecmp()
 
-// --- DEFINICIONES SIMPLIFICADAS ---
 #define LONGITUD_MAX_LINEA 1024
 #define TAMANIO_BLOQUE_INICIAL 10
 #define NOMBREDE_ARCHIVO "Recursos-reservas.csv"
 
-// --- 1. ESTRUCTURAS Y PUNTEROS (REQUISITOS CLAVE) ---
-
-// Estructura para cada fila del CSV
+// --- ESTRUCTURAS ---
 typedef struct {
-	char pais[50];
-	int anio;
-	float recursos;
-	float reservas;
+    char pais[50];
+    int anio;
+    float recursos;
+    float reservas;
 } Registro;
 
-// Nodo para la Pila (Punteros)
 typedef struct NodoPila {
-	Registro* dato; // El nodo de la pila APUNTA a un registro
-	struct NodoPila* siguiente;
+    Registro* dato;
+    struct NodoPila* siguiente;
 } NodoPila;
 
-// Estructura de control de la Pila
 typedef struct {
-	NodoPila* tope;
+    NodoPila* tope;
 } Pila;
 
-// Estructura para almacenar TODOS los datos del CSV (Array Dinamico)
 typedef struct {
-	Registro* registros; // Puntero al array dinamico de todos los datos
-	int cantidad;
-	int capacidad;
+    Registro* registros;
+    int cantidad;
+    int capacidad;
 } DatosMaestros;
 
+// --- UTILIDADES ---
+void limpiar_buffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
 
-// --- 2. FUNCIONES DE UTILIDAD Y TIEMPO ---
-
-// Muestra la hora actual (en la que se compila el codigo)
 void mostrar_hora_actual() {
-	time_t ahora = time(NULL);
-	struct tm *info_tiempo = localtime(&ahora); 
-	
-	char buffer[50]; 
-	strftime(buffer, sizeof(buffer), "[%d/%m/%Y %H:%M:%S]", info_tiempo); 
-	
-	printf("%s ", buffer);
+    time_t ahora = time(NULL);
+    struct tm *info_tiempo = localtime(&ahora);
+    char buffer[50];
+    strftime(buffer, sizeof(buffer), "[%d/%m/%Y %H:%M:%S]", info_tiempo);
+    printf("%s ", buffer);
 }
 
-// Convierte cadena a float (simplificado)
 float obtener_valor_flotante(char *cadena) {
-	// Retorna 0.0 si la cadena esta vacia o es un "-"
-	if (cadena == NULL || cadena[0] == '\0' || strcmp(cadena, "-") == 0) {
-		return 0.0; 
-	}
-	return atof(cadena);
+    if (cadena == NULL || cadena[0] == '\0' || strcmp(cadena, "-") == 0)
+        return 0.0;
+    return atof(cadena);
 }
 
-// Asegura que el array tenga espacio (realloc)
-void asegurar_espacio(DatosMaestros *datos) {
-	if (datos->cantidad == datos->capacidad) {
-		datos->capacidad *= 2;
-		datos->registros = (Registro*)realloc(datos->registros, datos->capacidad * sizeof(Registro));
-		if (datos->registros == NULL) {
-			perror("Error de memoria. No se pudo asegurar el espacio.");
-			return; 
-		}
-	}
+void limpiar_espacios(char *cadena) {
+    if (!cadena) return;
+    int inicio = 0;
+    while (isspace((unsigned char)cadena[inicio])) inicio++;
+    int fin = strlen(cadena) - 1;
+    while (fin >= inicio && isspace((unsigned char)cadena[fin])) fin--;
+    memmove(cadena, cadena + inicio, fin - inicio + 1);
+    cadena[fin - inicio + 1] = '\0';
+    if (cadena[0] == '"' && cadena[strlen(cadena) - 1] == '"') {
+        memmove(cadena, cadena + 1, strlen(cadena) - 2);
+        cadena[strlen(cadena) - 2] = '\0';
+    }
 }
 
-
-// --- 3. FUNCIONES DE LA PILA (PUNTEROS Y MEMORIA) ---
-
-void inicializar_pila(Pila* p) {
-	p->tope = NULL;
+int asegurar_espacio(DatosMaestros *datos) {
+    if (datos->cantidad == datos->capacidad) {
+        datos->capacidad *= 2;
+        Registro* nuevo = realloc(datos->registros, datos->capacidad * sizeof(Registro));
+        if (!nuevo) {
+            datos->capacidad /= 2;
+            perror("Error de memoria al ampliar array");
+            return 0;
+        }
+        datos->registros = nuevo;
+    }
+    return 1;
 }
+
+// --- PILA ---
+void inicializar_pila(Pila* p) { p->tope = NULL; }
 
 void push(Pila* p, Registro* r) {
-	NodoPila* nuevo_nodo = (NodoPila*)malloc(sizeof(NodoPila));
-	if (nuevo_nodo == NULL) {
-		perror("Error al asignar memoria para apilar datos");
-		return;
-	}
-	nuevo_nodo->dato = r; 
-	nuevo_nodo->siguiente = p->tope;
-	p->tope = nuevo_nodo;
+    NodoPila* nuevo = malloc(sizeof(NodoPila));
+    if (!nuevo) { perror("Error al apilar"); return; }
+    nuevo->dato = r;
+    nuevo->siguiente = p->tope;
+    p->tope = nuevo;
 }
 
 Registro* pop(Pila* p) {
-	if (p->tope == NULL) {
-		return NULL;
-	}
-	
-	NodoPila* nodo_a_eliminar = p->tope;
-	Registro* dato_retorno = nodo_a_eliminar->dato;
-	
-	p->tope = p->tope->siguiente;
-	free(nodo_a_eliminar); 
-	
-	return dato_retorno;
+    if (!p->tope) return NULL;
+    NodoPila* nodo = p->tope;
+    Registro* dato = nodo->dato;
+    p->tope = nodo->siguiente;
+    free(nodo);
+    return dato;
 }
 
-int esta_vacia(Pila* p) {
-	return (p->tope == NULL);
-}
+int esta_vacia(Pila* p) { return p->tope == NULL; }
 
-void liberar_pila(Pila* p) {
-	while (esta_vacia(p) == 0) {
-		pop(p);
-	}
-}
+void liberar_pila(Pila* p) { while (!esta_vacia(p)) pop(p); }
 
-// --- 4. CARGA DE CSV (Uso de Archivos) ---
-
+// --- CSV ---
 int cargar_datos_csv(DatosMaestros *datos) {
-	FILE *archivo = fopen(NOMBREDE_ARCHIVO, "r");
-	if (archivo == NULL) {
-		perror("Error al abrir el archivo");
-		return 0; 
-	}
-	
-	char linea[LONGITUD_MAX_LINEA];
-	if (fgets(linea, LONGITUD_MAX_LINEA, archivo) == NULL) {
-		fclose(archivo);
-		return 0;
-	}
-	
-	datos->registros = (Registro*)malloc(TAMANIO_BLOQUE_INICIAL * sizeof(Registro));
-	datos->cantidad = 0;
-	datos->capacidad = TAMANIO_BLOQUE_INICIAL;
-	if (datos->registros == NULL) {
-		perror("Error al asignar memoria");
-		fclose(archivo);
-		return 0;
-	}
-	
-	while (fgets(linea, LONGITUD_MAX_LINEA, archivo)) {
-		asegurar_espacio(datos);
-		
-		// strdup no es estándar, pero se mantiene la lógica original
-		char *copia_linea = strdup(linea); 
-		char *token;
-		Registro nuevo_registro;
-		
-		// Parsing de la linea
-		token = strtok(copia_linea, ","); strncpy(nuevo_registro.pais, token ? token : "", 49); nuevo_registro.pais[49] = '\0';
-		token = strtok(NULL, ","); nuevo_registro.anio = token ? atoi(token) : 0;
-		token = strtok(NULL, ","); nuevo_registro.recursos = obtener_valor_flotante(token);
-		token = strtok(NULL, ",\n"); nuevo_registro.reservas = obtener_valor_flotante(token);
-		
-		// Almacenamiento en el array dinamico creado
-		datos->registros[datos->cantidad++] = nuevo_registro;
-		free(copia_linea); 
-	}
-	
-	fclose(archivo);
-	mostrar_hora_actual();
-	printf("Datos cargados. Total de registros: %d\n", datos->cantidad);
-	return 1; //Carga exitosa
+    FILE *archivo = fopen(NOMBREDE_ARCHIVO, "r");
+    if (!archivo) {
+        perror("Error al abrir el archivo CSV");
+        return 0;
+    }
+
+    char linea[LONGITUD_MAX_LINEA];
+    fgets(linea, LONGITUD_MAX_LINEA, archivo); // descartar encabezado
+
+    datos->registros = malloc(TAMANIO_BLOQUE_INICIAL * sizeof(Registro));
+    if (!datos->registros) { perror("Error de memoria inicial"); fclose(archivo); return 0; }
+    datos->cantidad = 0;
+    datos->capacidad = TAMANIO_BLOQUE_INICIAL;
+
+    while (fgets(linea, LONGITUD_MAX_LINEA, archivo)) {
+        if (!asegurar_espacio(datos)) break;
+
+        char *copia = malloc(strlen(linea) + 1);
+        if (!copia) { perror("Error al duplicar línea"); break; }
+        strcpy(copia, linea);
+
+        Registro nuevo;
+        char *token;
+
+        token = strtok(copia, ",;\t");
+        strncpy(nuevo.pais, token ? token : "", 49);
+        nuevo.pais[49] = '\0';
+        limpiar_espacios(nuevo.pais);
+
+        token = strtok(NULL, ",;\t");
+        nuevo.anio = token ? atoi(token) : 0;
+
+        token = strtok(NULL, ",;\t");
+        nuevo.recursos = obtener_valor_flotante(token);
+
+        token = strtok(NULL, ",;\t\n");
+        nuevo.reservas = obtener_valor_flotante(token);
+
+        datos->registros[datos->cantidad++] = nuevo;
+        free(copia);
+    }
+
+    fclose(archivo);
+    mostrar_hora_actual();
+    printf("Datos cargados. Total de registros: %d\n", datos->cantidad);
+    return 1;
 }
 
-
-// --- 5. ANALISIS DE TENDENCIA (USO DE PILA) ---
-
+// --- TENDENCIA ---
 void analizar_tendencia(DatosMaestros *datos) {
-	if (datos->cantidad == 0) {
-		printf("Error,datos no cargados, el archivo esta vaciO\n");
-		return;
-	}
-	mostrar_hora_actual();
-	printf("Iniciando analisis de la Tendencia Historica.\n");
-	
-	char pais_filtro[50];
-	int anio_inicio, anio_fin;
-	
-	printf("Ingrese el pais a analizar: ");
-	// El %s lee la cadena y se detiene en el primer espacio o nueva línea
-	scanf("%49s", pais_filtro); 
-	
-	// Limpieza de buffer después de leer la cadena del país (si el usuario ingresa más caracteres o usa el espacio)
-	int c; while ((c = getchar()) != '\n' && c != EOF);
-	
-	printf("Ingrese Anio de inicio: ");
-	scanf("%d", &anio_inicio);
-	printf("Ingrese anio de fin: ");
-	scanf("%d", &anio_fin);
-	
-	// Limpieza de buffer después de leer el segundo entero (anio_fin)
-	while ((c = getchar()) != '\n' && c != EOF);
-	
-	Pila pila_analisis;
-	inicializar_pila(&pila_analisis);
-	
-	// Filtrar y Apilar (la pila invierte el orden cronologico)
-	for (int i = 0; i < datos->cantidad; i++) {
-		Registro *r = &datos->registros[i];
-		if (strcmp(r->pais, pais_filtro) == 0 && r->anio >= anio_inicio && r->anio <= anio_fin) {
-			push(&pila_analisis, r); // Puntero al registro
-		}
-	}
-	
-	if (esta_vacia(&pila_analisis)) {
-		printf("No hay datos disponibles ni encontrados para el pais y rango de anios.\n");
-		return;
-	}
-	
-	Registro *reciente = pop(&pila_analisis);
-	Registro *anterior;
-	
-	printf("\nTendencia de %s (Cambio Anios a Anios) \n", pais_filtro);
+    if (datos->cantidad == 0) {
+        printf("Error: no hay datos cargados.\n");
+        return;
+    }
 
-	// Imprimir cabecera tipo tabla (con tabulaciones para alinear)
-	printf("Anio_Anterior\t|\tAnio_Reciente\t|\tRecursos_Reciente\t|\tVar_Recursos\t|\tReservas_Reciente\t|\tVar_Reservas\n");
-	printf("---------------------------------------------------------------------------------------------\n");
+    char pais_filtro[50];
+    int anio_inicio, anio_fin;
 
-	// Analisis LIFO usando POP
-	while (!esta_vacia(&pila_analisis)) {
-		anterior = pop(&pila_analisis);
+    printf("Ingrese el pais a analizar: ");
+    if (scanf("%49s", pais_filtro) != 1) return;
+    limpiar_espacios(pais_filtro);
 
-		float cambio_rec = reciente->recursos - anterior->recursos;
-		float cambio_res = reciente->reservas - anterior->reservas;
+    printf("Ingrese año de inicio: ");
+    if (scanf("%d", &anio_inicio) != 1) return;
 
-		// Formato tipo tabla con tabulacion alrededor de '|'
-		printf("%d\t|\t%d\t|\t%.2f\t|\t%.2f\t|\t%.2f\t|\t%.2f\n",
-			anterior->anio, reciente->anio,
-			reciente->recursos, cambio_rec,
-			reciente->reservas, cambio_res);
+    printf("Ingrese año de fin: ");
+    if (scanf("%d", &anio_fin) != 1) return;
 
-		reciente = anterior;
-	}
-	liberar_pila(&pila_analisis);
+    if (anio_inicio > anio_fin) {
+        printf("El año de inicio no puede ser mayor al de fin.\n");
+        return;
+    }
+
+    Pila pila;
+    inicializar_pila(&pila);
+
+    for (int i = 0; i < datos->cantidad; i++) {
+        Registro *r = &datos->registros[i];
+        if (strcasecmp(r->pais, pais_filtro) == 0 && r->anio >= anio_inicio && r->anio <= anio_fin)
+            push(&pila, r);
+    }
+
+    if (esta_vacia(&pila)) {
+        printf("No se encontraron registros para ese país y rango de años.\n");
+        return;
+    }
+
+    Registro *reciente = pop(&pila);
+    Registro *anterior;
+
+    printf("\nTendencia de %s\n", pais_filtro);
+    printf("Año_Anterior | Año_Reciente | Recursos | ΔRecursos | Reservas | ΔReservas\n");
+    printf("--------------------------------------------------------------------------\n");
+
+    while (!esta_vacia(&pila)) {
+        anterior = pop(&pila);
+        float var_rec = reciente->recursos - anterior->recursos;
+        float var_res = reciente->reservas - anterior->reservas;
+        printf("%d\t|\t%d\t|\t%.2f\t|\t%.2f\t|\t%.2f\t|\t%.2f\n",
+               anterior->anio, reciente->anio,
+               reciente->recursos, var_rec,
+               reciente->reservas, var_res);
+        reciente = anterior;
+    }
+
+    liberar_pila(&pila);
 }
 
-
-// --- 6. TOP N ---
-
-// Función auxiliar para intercambiar dos Registros (necesaria para el Bubble Sort)
+// --- TOP N ---
 void intercambiar_registro(Registro *a, Registro *b) {
-	Registro temp = *a; // Almacena el contenido de 'a'
-	*a = *b;            // Copia el contenido de 'b' en 'a'
-	*b = temp;          // Copia el contenido temporal en 'b'
+    Registro tmp = *a; *a = *b; *b = tmp;
 }
 
-// Ordenamiento bubble sort
-void ordenar_bubble_sort(DatosMaestros *lista, int opcion_criterio) {
-	int i, j;
-	int n = lista->cantidad;
-	
-	for (i = 0; i < n - 1; i++) {
-		for (j = 0; j < n - i - 1; j++) {
-			Registro *regA = &lista->registros[j];
-			Registro *regB = &lista->registros[j + 1];
-			int intercambio = 0;
-			
-			if (opcion_criterio == 1) { // Ordenar por Recursos (Mayor a Menor)
-				if (regA->recursos < regB->recursos) {
-					intercambio = 1;
-				}
-			} else { // Ordenar por Reservas (Mayor a Menor)
-				if (regA->reservas < regB->reservas) {
-					intercambio = 1;
-				}
-			}
-			if (intercambio) {
-				intercambiar_registro(regA, regB);
-			}
-		}
-	}
+void ordenar_bubble_sort(DatosMaestros *lista, int criterio) {
+    int n = lista->cantidad;
+    for (int i = 0; i < n - 1; i++)
+        for (int j = 0; j < n - i - 1; j++) {
+            Registro *A = &lista->registros[j];
+            Registro *B = &lista->registros[j + 1];
+            int swap = 0;
+            if (criterio == 1 && A->recursos < B->recursos) swap = 1;
+            else if (criterio == 2 && A->reservas < B->reservas) swap = 1;
+            if (swap) intercambiar_registro(A, B);
+        }
 }
 
 void calcular_top_n(DatosMaestros *datos) {
-	if (datos->cantidad == 0) {
-		printf("Error: Datos no cargados.\n");
-		return;
-	}
-	mostrar_hora_actual();
-	printf("Iniciando calculo de Top N.\n");
-	
-	int anio_seleccionado, n, opcion_criterio;
-	printf("Ingrese anio a analizar: ");
-	scanf("%d", &anio_seleccionado);
-	printf("Ingrese el numero N (1,2...): ");
-	scanf("%d", &n);
-	printf("Seleccione el criterio que desea usar para el top ordenado (1: Recursos, 2: Reservas): ");
-	scanf("%d", &opcion_criterio);
-	
-	// Limpieza de buffer después de leer el entero (si no se hace, el menú falla al volver)
-	int c; while ((c = getchar()) != '\n' && c != EOF); 
-	
-	// Array auxiliar para ordenar
-	DatosMaestros datos_auxiliares = {NULL, 0, TAMANIO_BLOQUE_INICIAL};
-	datos_auxiliares.registros = (Registro*)malloc(TAMANIO_BLOQUE_INICIAL * sizeof(Registro));
-	if (datos_auxiliares.registros == NULL) return; 
-	
-	// 1. Filtrar los datos para el año
-	for (int i = 0; i < datos->cantidad; i++) {
-		Registro r = datos->registros[i];
-		if (r.anio == anio_seleccionado) {
-			asegurar_espacio(&datos_auxiliares);
-			datos_auxiliares.registros[datos_auxiliares.cantidad++] = r;
-		}
-	}
-	
-	if (datos_auxiliares.cantidad == 0) {
-		printf("No se encontraron datos para el anio %d.\n", anio_seleccionado);
-		free(datos_auxiliares.registros);
-		return;
-	}
-	
-	char *criterio_elegido = "";
-	if (opcion_criterio == 1) {
-		criterio_elegido = "Recursos";
-	} else if (opcion_criterio == 2) {
-		criterio_elegido = "Reservas";
-	} else {
-		printf("Opcion de criterio invalida.\n");
-		free(datos_auxiliares.registros);
-		return;
-	}
-	
-	// Ordenamiento con bubble sort
-	ordenar_bubble_sort(&datos_auxiliares, opcion_criterio);
-	
-	// 3. Imprimir el Top N en formato tabular (una fila por item)
-	printf("\nEl top %d de %s para el anio %d\n", n, criterio_elegido, anio_seleccionado);
-	int limite = (n < datos_auxiliares.cantidad) ? n : datos_auxiliares.cantidad;
+    if (datos->cantidad == 0) {
+        printf("Error: no hay datos cargados.\n");
+        return;
+    }
 
-	// Cabecera tipo tabla (con tabulaciones)
-	printf("Pos\t|\tPais\t|\t%s\n", criterio_elegido);
-	printf("------------------------------------\n");
+    int anio, n, criterio;
+    printf("Ingrese año a analizar: ");
+    if (scanf("%d", &anio) != 1) return;
+    printf("Ingrese N (cantidad de países): ");
+    if (scanf("%d", &n) != 1 || n < 1) return;
+    printf("Criterio (1: Recursos, 2: Reservas): ");
+    if (scanf("%d", &criterio) != 1 || (criterio != 1 && criterio != 2)) return;
 
-	for (int i = 0; i < limite; i++) {
-		Registro *r = &datos_auxiliares.registros[i];
-		float valor = (opcion_criterio == 1) ? r->recursos : r->reservas;
-		// Imprimir cada fila con tabulaciones alrededor de '|'
-		printf("%d\t|\t%s\t|\t%.2f\n", i + 1, r->pais, valor);
-	}
-	
-	free(datos_auxiliares.registros);
+    DatosMaestros aux = {malloc(TAMANIO_BLOQUE_INICIAL * sizeof(Registro)), 0, TAMANIO_BLOQUE_INICIAL};
+    if (!aux.registros) { perror("Error de memoria"); return; }
+
+    for (int i = 0; i < datos->cantidad; i++) {
+        if (datos->registros[i].anio == anio) {
+            if (!asegurar_espacio(&aux)) break;
+            aux.registros[aux.cantidad++] = datos->registros[i];
+        }
+    }
+
+    if (aux.cantidad == 0) {
+        printf("No hay datos para el año %d.\n", anio);
+        free(aux.registros);
+        return;
+    }
+
+    ordenar_bubble_sort(&aux, criterio);
+    printf("\nTop %d por %s en %d\n", n, criterio == 1 ? "Recursos" : "Reservas", anio);
+    printf("Pos | País | Valor\n");
+    printf("---------------------------\n");
+    for (int i = 0; i < n && i < aux.cantidad; i++) {
+        float valor = criterio == 1 ? aux.registros[i].recursos : aux.registros[i].reservas;
+        printf("%d | %s | %.2f\n", i + 1, aux.registros[i].pais, valor);
+    }
+
+    free(aux.registros);
 }
-// --- 7. FUNCION PRINCIPAL Y MENU ---
 
-int main() 
-{
-	char eleccionUsuario;
-	
-	printf("+----------------------------------------------------------+\n");
-	printf("|                                                          |\n");
-	printf("|                  BIENVENIDO/A AL PROGRAMA                |\n");
-	printf("|                      Proyecto: Litio                     |\n");
-	printf("|                  Reservas a nivel mundial                |\n");
-	printf("|                                                          |\n");
-	printf("+----------------------------------------------------------+\n");
-	
-	printf("\n");
-	printf("El programa se esta iniciando...\n");
-	printf("\n");
-	Sleep(5000); // Esperamos 5 segundos.
-	mostrar_hora_actual();
-	printf("Programa iniciado con exito.\n");
-	// La variable que contiene todos los datos cargados.
-	DatosMaestros datos_maestros = {NULL, 0, 0}; 
-	
-	// 1. Cargar datos. Si falla, datos_maestros.cantidad seria = 0.
-	if (!cargar_datos_csv(&datos_maestros)) 
-	{
-		printf("\nERROR: Terminando programa. Revise la ubicacion del archivo.\n");
-		return 1; // Retorno de error simple
-	}
-	printf("\n");
-	printf("Para desplegar el menu de opciones presione ENTER.\n");
+// --- MAIN ---
+int main() {
+    printf("+---------------------------------------------+\n");
+    printf("|         PROYECTO LITIO - RESERVAS CSV       |\n");
+    printf("+---------------------------------------------+\n\n");
 
-	int c; while ((c = getchar()) != '\n' && c != EOF);
-	
-	do 
-	{	
-		printf("Menu desplegado con exito.\n");
-		printf("\n");
-		printf("_______________________[MENU DE OPCIONES]__________________________\n");
-		printf("\n");
-		printf("[A] Analizar tendencia. \n[B] Calcular top. \n[C] Mostrar hora actual.\n[S] Salir.\n");
-		printf("___________________________________________________________________\n");
-		printf("\n");
-		printf("A continuacion ingrese una opcion:\n> ");
-		
-		if (scanf(" %c", &eleccionUsuario) != 1) { 
-			eleccionUsuario = ' '; // Opcion invalida
-		}
-		
-		while ((c = getchar()) != '\n' && c != EOF); 
-		
-		eleccionUsuario = tolower(eleccionUsuario);
-		
-		switch(eleccionUsuario) 
-		{
-		case 'a':
-			analizar_tendencia(&datos_maestros);
-			break;
-		case 'b':
-			calcular_top_n(&datos_maestros);
-			break;
-		case 'c':
-			printf("Hora actual: ");
-			mostrar_hora_actual();
-			printf("\n");
-			break;
-		case 's':
-			printf("Saliendo del programa...\nLiberando memoria...");
-			Sleep(3000);
-			printf("La memoria se libero con exito.\n");
-			break;
-		default:
-			printf("La opcion no corresponde, intente de nuevo.\n");
-		}
-	} while(eleccionUsuario != 's');
-	
-	// Liberacion de memoria principal (Punteros)
-	if (datos_maestros.registros != NULL) 
-	{
-		free(datos_maestros.registros);
-	}
-	return 0;
+    sleep(2);
+    mostrar_hora_actual();
+    printf("Iniciando programa...\n\n");
+
+    DatosMaestros datos = {NULL, 0, 0};
+    if (!cargar_datos_csv(&datos)) return 1;
+
+    char opcion;
+    do {
+        printf("\n[A] Analizar tendencia\n[B] Calcular top\n[C] Mostrar hora\n[S] Salir\n> ");
+        if (scanf(" %c", &opcion) != 1) opcion = ' ';
+        limpiar_buffer();
+        opcion = tolower(opcion);
+
+        switch (opcion) {
+            case 'a': analizar_tendencia(&datos); break;
+            case 'b': calcular_top_n(&datos); break;
+            case 'c': mostrar_hora_actual(); printf("\n"); break;
+            case 's': printf("Saliendo...\n"); break;
+            default: printf("Opción inválida.\n");
+        }
+    } while (opcion != 's');
+
+    free(datos.registros);
+    return 0;
 }
