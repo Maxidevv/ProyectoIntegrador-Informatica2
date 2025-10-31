@@ -290,7 +290,13 @@ int main() {
 
     char opcion;
     do {
-        printf("\n[A] Analizar tendencia\n[B] Calcular top\n[C] Mostrar hora\n[S] Salir\n> ");
+        printf("Menu desplegado con exito.\n");
+		printf("\n");
+		printf("_______________________[MENU DE OPCIONES]__________________________\n");
+		printf("\n");
+		printf("[A] Analizar tendencia. \n[B] Calcular top. \n[C] Mostrar hora actual.\n[S] Salir.\n");
+		printf("___________________________________________________________________\n");
+		printf("\n");
         if (scanf(" %c", &opcion) != 1) opcion = ' ';
         limpiar_buffer();
         opcion = tolower(opcion);
