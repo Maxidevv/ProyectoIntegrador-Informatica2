@@ -277,9 +277,13 @@ void calcular_top_n(DatosMaestros *datos) {
 
 // --- MAIN ---
 int main() {
-    printf("+---------------------------------------------+\n");
-    printf("|         PROYECTO LITIO - RESERVAS CSV       |\n");
-    printf("+---------------------------------------------+\n\n");
+	printf("+----------------------------------------------------------+\n");
+	printf("|                                                          |\n");
+	printf("|                  BIENVENIDO/A AL PROGRAMA                |\n");
+	printf("|                       Dataset: Litio                     |\n");
+	printf("|                  Reservas a nivel mundial                |\n");
+	printf("|                                                          |\n");
+	printf("+----------------------------------------------------------+\n");
 
     sleep(2);
     mostrar_hora_actual();
@@ -313,3 +317,4 @@ int main() {
     free(datos.registros);
     return 0;
 }
+
