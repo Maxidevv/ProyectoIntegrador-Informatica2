@@ -125,7 +125,7 @@ int cargar_datos_csv(DatosMaestros *datos) {
         if (!asegurar_espacio(datos)) break;
 
         char *copia = malloc(strlen(linea) + 1);
-        if (!copia) { perror("Error al duplicar línea"); break; }
+        if (!copia) { perror("Error al duplicar linea"); break; }
         strcpy(copia, linea);
 
         Registro nuevo;
@@ -169,14 +169,14 @@ void analizar_tendencia(DatosMaestros *datos) {
     if (scanf("%49s", pais_filtro) != 1) return;
     limpiar_espacios(pais_filtro);
 
-    printf("Ingrese año de inicio: ");
+    printf("Ingrese anio de inicio: ");
     if (scanf("%d", &anio_inicio) != 1) return;
 
-    printf("Ingrese año de fin: ");
+    printf("Ingrese anio de fin: ");
     if (scanf("%d", &anio_fin) != 1) return;
 
     if (anio_inicio > anio_fin) {
-        printf("El año de inicio no puede ser mayor al de fin.\n");
+        printf("El anio de inicio no puede ser mayor al de fin.\n");
         return;
     }
 
@@ -190,7 +190,7 @@ void analizar_tendencia(DatosMaestros *datos) {
     }
 
     if (esta_vacia(&pila)) {
-        printf("No se encontraron registros para ese país y rango de años.\n");
+        printf("No se encontraron registros para ese pais y rango de anios.\n");
         return;
     }
 
@@ -198,7 +198,7 @@ void analizar_tendencia(DatosMaestros *datos) {
     Registro *anterior;
 
     printf("\nTendencia de %s\n", pais_filtro);
-    printf("Año_Anterior | Año_Reciente | Recursos | ΔRecursos | Reservas | ΔReservas\n");
+    printf("Anio_Anterior | Anio_Reciente | Recursos | ΔRecursos | Reservas | ΔReservas\n");
     printf("--------------------------------------------------------------------------\n");
 
     while (!esta_vacia(&pila)) {
@@ -240,9 +240,9 @@ void calcular_top_n(DatosMaestros *datos) {
     }
 
     int anio, n, criterio;
-    printf("Ingrese año a analizar: ");
+    printf("Ingrese anio a analizar: ");
     if (scanf("%d", &anio) != 1) return;
-    printf("Ingrese N (cantidad de países): ");
+    printf("Ingrese N (cantidad de paises): ");
     if (scanf("%d", &n) != 1 || n < 1) return;
     printf("Criterio (1: Recursos, 2: Reservas): ");
     if (scanf("%d", &criterio) != 1 || (criterio != 1 && criterio != 2)) return;
@@ -258,14 +258,14 @@ void calcular_top_n(DatosMaestros *datos) {
     }
 
     if (aux.cantidad == 0) {
-        printf("No hay datos para el año %d.\n", anio);
+        printf("No hay datos para el anio %d.\n", anio);
         free(aux.registros);
         return;
     }
 
     ordenar_bubble_sort(&aux, criterio);
     printf("\nTop %d por %s en %d\n", n, criterio == 1 ? "Recursos" : "Reservas", anio);
-    printf("Pos | País | Valor\n");
+    printf("Pos | Pais | Valor\n");
     printf("---------------------------\n");
     for (int i = 0; i < n && i < aux.cantidad; i++) {
         float valor = criterio == 1 ? aux.registros[i].recursos : aux.registros[i].reservas;
@@ -294,6 +294,7 @@ int main() {
 
     char opcion;
     do {
+        printf("\n");
         printf("Menu desplegado con exito.\n");
 		printf("\n");
 		printf("_______________________[MENU DE OPCIONES]__________________________\n");
@@ -310,11 +311,10 @@ int main() {
             case 'b': calcular_top_n(&datos); break;
             case 'c': mostrar_hora_actual(); printf("\n"); break;
             case 's': printf("Saliendo...\n"); break;
-            default: printf("Opción inválida.\n");
+            default: printf("Opcion invalida.\n");
         }
     } while (opcion != 's');
 
     free(datos.registros);
     return 0;
 }
-
