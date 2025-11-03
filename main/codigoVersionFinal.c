@@ -8,7 +8,7 @@
 
 #define LONGITUD_MAX_LINEA 1024
 #define TAMANIO_BLOQUE_INICIAL 10
-#define NOMBREDE_ARCHIVO "Recursos-reservas.csv"
+#define NOMBREDE_ARCHIVO "resources/Recursos-reservas.csv"
 
 // --- ESTRUCTURAS ---
 typedef struct {
@@ -318,3 +318,4 @@ int main() {
     free(datos.registros);
     return 0;
 }
+
